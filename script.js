@@ -17,7 +17,7 @@ document.querySelectorAll('.brand-image img,.section-logo,.footer-logo').forEach
 const setupEdsonFallback=img=>{
   if(!img||img.dataset.fallbackReady)return;
   img.dataset.fallbackReady='1';
-  img.addEventListener('error',async()=>{
+  const useFallback=async()=>{
     if(img.dataset.fallbackUsed)return;
     img.dataset.fallbackUsed='1';
     try{
@@ -26,7 +26,9 @@ const setupEdsonFallback=img=>{
       const b64=(await res.text()).trim();
       img.src='data:image/jpeg;base64,'+b64;
     }catch(err){console.warn('Não foi possível carregar a foto de Edson Costa.',err);}
-  },{once:true});
+  };
+  img.addEventListener('error',useFallback,{once:true});
+  if(img.complete&&img.naturalWidth===0)useFallback();
 };
 
 // Seção institucional por setores.
