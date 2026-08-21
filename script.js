@@ -4,6 +4,15 @@
   const $ = (s, c=document) => c.querySelector(s);
   const $$ = (s, c=document) => [...c.querySelectorAll(s)];
 
+  // Carrega o enquadramento oficial da marca em todas as áreas do site.
+  if (!document.querySelector('link[data-elmaq-brand-v16]')) {
+    const brandCss = document.createElement('link');
+    brandCss.rel = 'stylesheet';
+    brandCss.href = 'brand-v16.css?v=16';
+    brandCss.dataset.elmaqBrandV16 = 'true';
+    document.head.appendChild(brandCss);
+  }
+
   // Logo oficial ELMAQ em toda a estrutura visual do site.
   const officialLogo = 'assets/logo-elmaq-oficial.jpg?v=16';
   $$('img').forEach(img => {
@@ -15,6 +24,27 @@
       img.decoding = 'async';
     }
   });
+
+  // Marca também dentro do menu interativo.
+  const megaHead = $('.mega-head');
+  if (megaHead && !$('.mega-brand-logo', megaHead)) {
+    const logo = document.createElement('img');
+    logo.className = 'mega-brand-logo';
+    logo.src = officialLogo;
+    logo.alt = 'ELMAQ Engenharia e Máquinas para Artefatos de Concreto';
+    megaHead.prepend(logo);
+  }
+
+  // Assinatura de marca antes dos QR Codes e canais oficiais.
+  const socialQr = $('.social-qr');
+  if (socialQr && !document.querySelector('.contact-brand-logo')) {
+    const logo = document.createElement('img');
+    logo.className = 'contact-brand-logo';
+    logo.src = officialLogo;
+    logo.alt = 'ELMAQ Engenharia e Máquinas para Artefatos de Concreto';
+    socialQr.parentNode.insertBefore(logo, socialQr);
+  }
+
   const favicon = document.querySelector('link[rel="icon"]');
   if (favicon) {
     favicon.type = 'image/jpeg';
