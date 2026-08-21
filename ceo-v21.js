@@ -19,7 +19,7 @@
     section.innerHTML = `
       <div class="wrap ceo-wrap reveal visible">
         <div class="ceo-photo">
-          <img src="assets/luis-ceo-elmaq.webp?v=21" alt="Luis, CEO da ELMAQ Engenharia" loading="lazy" decoding="async">
+          <img src="assets/luis-felipe.jpg?v=21" alt="Luis, CEO da ELMAQ Engenharia" loading="lazy" decoding="async">
         </div>
         <div class="ceo-copy">
           <span class="ceo-kicker">Direção executiva</span>
