@@ -5,7 +5,7 @@
   if (!document.querySelector('link[data-elmaq-rafael-v22]')) {
     const css = document.createElement('link');
     css.rel = 'stylesheet';
-    css.href = 'rafael-v22.css?v=22';
+    css.href = 'rafael-v22.css?v=23';
     css.dataset.elmaqRafaelV22 = 'true';
     document.head.appendChild(css);
   }
@@ -19,7 +19,7 @@
     section.innerHTML = `
       <div class="wrap technical-director-wrap reveal visible">
         <div class="technical-director-photo">
-          <img src="assets/rafael-augusto-diretor-tecnico-producao.png?v=22" alt="Rafael Augusto, Diretor Técnico de Produção da ELMAQ Engenharia" loading="eager" decoding="async">
+          <img src="https://raw.githubusercontent.com/elmaq-engenharia/elmaq-engenharia-site/main/assets/rafael-augusto-diretor-tecnico-producao.png?v=23" alt="Rafael Augusto, Diretor Técnico de Produção da ELMAQ Engenharia" loading="eager" decoding="async">
         </div>
         <div class="technical-director-data">
           <span class="technical-director-kicker">Direção Técnica</span>
