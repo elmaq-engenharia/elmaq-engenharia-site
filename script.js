@@ -5,32 +5,68 @@
   const $$ = (s, c=document) => [...c.querySelectorAll(s)];
 
   // Carrega o enquadramento oficial da marca em todas as áreas do site.
-  if (!document.querySelector('link[data-elmaq-brand-v19]')) {
+  if (!document.querySelector('link[data-elmaq-brand-v20]')) {
     const brandCss = document.createElement('link');
     brandCss.rel = 'stylesheet';
-    brandCss.href = 'brand-v16.css?v=19';
-    brandCss.dataset.elmaqBrandV19 = 'true';
+    brandCss.href = 'brand-v16.css?v=20';
+    brandCss.dataset.elmaqBrandV20 = 'true';
     document.head.appendChild(brandCss);
   }
 
-  // Logo oficial ELMAQ em alta definição em toda a estrutura visual do site.
-  const officialLogo = 'assets/logo-elmaq-oficial.jpg?v=19';
-  $$('img').forEach(img => {
+  // Logo ELMAQ: só troca a imagem depois que o arquivo realmente carregar.
+  // Assim, se um arquivo falhar na Vercel, a marca não some do cabeçalho.
+  const logoCandidates = [
+    'assets/logo-elmaq-oficial.jpg?v=20',
+    'assets/logo-elmaq-oficial-v18.jpg?v=20',
+    'assets/logo-elmaq-site.jpg?v=20',
+    'assets/logo-elmaq-site.svg?v=20'
+  ];
+  const fallbackLogo = 'assets/logo-elmaq-site.svg?v=20';
+  let officialLogo = fallbackLogo;
+
+  const isLogoImage = img => {
     const src = img.getAttribute('src') || '';
     const cls = img.className || '';
-    if (src.includes('logo-elmaq') || cls.includes('footer-logo') || img.closest('.brand')) {
-      img.src = officialLogo;
+    return src.includes('logo-elmaq') || cls.includes('footer-logo') || cls.includes('mega-brand-logo') || cls.includes('contact-brand-logo') || !!img.closest('.brand');
+  };
+
+  const applyLogo = src => {
+    officialLogo = src;
+    $$('img').forEach(img => {
+      if (!isLogoImage(img)) return;
+      img.onerror = () => {
+        img.onerror = null;
+        img.src = fallbackLogo;
+      };
+      img.src = src;
       img.alt = 'ELMAQ Engenharia e Máquinas para Artefatos de Concreto';
       img.decoding = 'async';
+    });
+    const favicon = document.querySelector('link[rel="icon"]');
+    if (favicon) {
+      favicon.type = src.endsWith('.svg?v=20') ? 'image/svg+xml' : 'image/jpeg';
+      favicon.href = src;
     }
-  });
+  };
+
+  // Mantém uma logo funcional imediatamente, enquanto testa a versão oficial.
+  applyLogo(fallbackLogo);
+
+  const tryLogo = index => {
+    if (index >= logoCandidates.length) return;
+    const test = new Image();
+    test.onload = () => applyLogo(logoCandidates[index]);
+    test.onerror = () => tryLogo(index + 1);
+    test.src = logoCandidates[index];
+  };
+  tryLogo(0);
 
   // Marca também dentro do menu interativo.
   const megaHead = $('.mega-head');
   if (megaHead && !$('.mega-brand-logo', megaHead)) {
     const logo = document.createElement('img');
     logo.className = 'mega-brand-logo';
-    logo.src = officialLogo;
+    logo.src = fallbackLogo;
     logo.alt = 'ELMAQ Engenharia e Máquinas para Artefatos de Concreto';
     megaHead.prepend(logo);
   }
@@ -40,18 +76,13 @@
   if (socialQr && !document.querySelector('.contact-brand-logo')) {
     const logo = document.createElement('img');
     logo.className = 'contact-brand-logo';
-    logo.src = officialLogo;
+    logo.src = fallbackLogo;
     logo.alt = 'ELMAQ Engenharia e Máquinas para Artefatos de Concreto';
     socialQr.parentNode.insertBefore(logo, socialQr);
   }
 
-  const favicon = document.querySelector('link[rel="icon"]');
-  if (favicon) {
-    favicon.type = 'image/jpeg';
-    favicon.href = officialLogo;
-  }
   const ogImage = document.querySelector('meta[property="og:image"]');
-  if (ogImage) ogImage.content = 'https://elmaq-engenharia-site.vercel.app/assets/logo-elmaq-oficial.jpg?v=19';
+  if (ogImage) ogImage.content = 'https://elmaq-engenharia-site.vercel.app/assets/logo-elmaq-oficial.jpg?v=20';
 
   const menuBtn = $('.menu-button');
   const mega = $('#mega-menu');
