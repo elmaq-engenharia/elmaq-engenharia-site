@@ -5,16 +5,16 @@
   const $$ = (s, c=document) => [...c.querySelectorAll(s)];
 
   // Carrega o enquadramento oficial da marca em todas as áreas do site.
-  if (!document.querySelector('link[data-elmaq-brand-v16]')) {
+  if (!document.querySelector('link[data-elmaq-brand-v19]')) {
     const brandCss = document.createElement('link');
     brandCss.rel = 'stylesheet';
-    brandCss.href = 'brand-v16.css?v=16';
-    brandCss.dataset.elmaqBrandV16 = 'true';
+    brandCss.href = 'brand-v16.css?v=19';
+    brandCss.dataset.elmaqBrandV19 = 'true';
     document.head.appendChild(brandCss);
   }
 
-  // Logo oficial ELMAQ em toda a estrutura visual do site.
-  const officialLogo = 'assets/logo-elmaq-oficial.jpg?v=16';
+  // Logo oficial ELMAQ em alta definição em toda a estrutura visual do site.
+  const officialLogo = 'assets/logo-elmaq-oficial.jpg?v=19';
   $$('img').forEach(img => {
     const src = img.getAttribute('src') || '';
     const cls = img.className || '';
@@ -51,7 +51,7 @@
     favicon.href = officialLogo;
   }
   const ogImage = document.querySelector('meta[property="og:image"]');
-  if (ogImage) ogImage.content = 'https://elmaq-engenharia-site.vercel.app/assets/logo-elmaq-oficial.jpg?v=16';
+  if (ogImage) ogImage.content = 'https://elmaq-engenharia-site.vercel.app/assets/logo-elmaq-oficial.jpg?v=19';
 
   const menuBtn = $('.menu-button');
   const mega = $('#mega-menu');
