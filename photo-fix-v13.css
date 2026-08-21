@@ -1,0 +1,24 @@
+/* ELMAQ v13 — correção específica de nitidez/enquadramento da equipe */
+.person-media{
+  height:330px!important;
+  background:#03080c!important;
+  overflow:hidden!important;
+  position:relative!important;
+}
+.person-media img{
+  display:block!important;
+  width:100%!important;
+  height:100%!important;
+  object-fit:cover!important;
+  object-position:center 24%!important;
+  background:#03080c!important;
+  filter:none!important;
+  transform:none!important;
+  image-rendering:auto!important;
+}
+.person:nth-child(1) .person-media img{object-position:center 32%!important;}
+.person:nth-child(2) .person-media img{object-position:center 18%!important;}
+.person:nth-child(3) .person-media img{object-position:center 18%!important;}
+@media(max-width:760px){
+  .person-media{height:360px!important;}
+}
