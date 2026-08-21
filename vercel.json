@@ -45,6 +45,24 @@
       ]
     },
     {
+      "source": "/edson-v27.js",
+      "headers": [
+        { "key": "Cache-Control", "value": "no-cache, no-store, must-revalidate" }
+      ]
+    },
+    {
+      "source": "/edson-v27.css",
+      "headers": [
+        { "key": "Cache-Control", "value": "no-cache, no-store, must-revalidate" }
+      ]
+    },
+    {
+      "source": "/assets/edson-costa-v27.b64.txt",
+      "headers": [
+        { "key": "Cache-Control", "value": "no-cache, no-store, must-revalidate" }
+      ]
+    },
+    {
       "source": "/brand-v16.css",
       "headers": [
         { "key": "Cache-Control", "value": "no-cache, no-store, must-revalidate" }
