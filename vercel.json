@@ -9,6 +9,24 @@
       ]
     },
     {
+      "source": "/script-core-v20.js",
+      "headers": [
+        { "key": "Cache-Control", "value": "no-cache, no-store, must-revalidate" }
+      ]
+    },
+    {
+      "source": "/ceo-v21.js",
+      "headers": [
+        { "key": "Cache-Control", "value": "no-cache, no-store, must-revalidate" }
+      ]
+    },
+    {
+      "source": "/ceo-v21.css",
+      "headers": [
+        { "key": "Cache-Control", "value": "no-cache, no-store, must-revalidate" }
+      ]
+    },
+    {
       "source": "/brand-v16.css",
       "headers": [
         { "key": "Cache-Control", "value": "no-cache, no-store, must-revalidate" }
