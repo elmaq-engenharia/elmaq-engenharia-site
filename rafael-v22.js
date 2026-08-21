@@ -2,11 +2,11 @@
   'use strict';
   const $ = (s, c=document) => c.querySelector(s);
 
-  if (!document.querySelector('link[data-elmaq-rafael-v25]')) {
+  if (!document.querySelector('link[data-elmaq-rafael-v26]')) {
     const css = document.createElement('link');
     css.rel = 'stylesheet';
-    css.href = 'rafael-v22.css?v=25';
-    css.dataset.elmaqRafaelV25 = 'true';
+    css.href = 'rafael-v22.css?v=26';
+    css.dataset.elmaqRafaelV26 = 'true';
     document.head.appendChild(css);
   }
 
@@ -19,7 +19,7 @@
     section.innerHTML = `
       <div class="wrap technical-director-wrap reveal visible">
         <div class="technical-director-photo">
-          <img src="assets/rafael-augusto-v25.webp?v=25" alt="Rafael Augusto, Diretor Técnico de Produção da ELMAQ Engenharia" loading="eager" decoding="sync" fetchpriority="high">
+          <img id="rafael-photo" alt="Rafael Augusto, Diretor Técnico de Produção da ELMAQ Engenharia" loading="eager" decoding="sync" style="display:block!important;opacity:1!important;visibility:visible!important;width:100%;height:100%;object-fit:cover;object-position:center 25%;">
         </div>
         <div class="technical-director-data">
           <span class="technical-director-kicker">Direção Técnica</span>
@@ -37,11 +37,19 @@
     (ceoSection || hero).insertAdjacentElement('afterend', section);
   }
 
-  const photo = document.querySelector('#diretoria-tecnica .technical-director-photo img');
+  const photo = $('#rafael-photo');
   if (photo) {
-    photo.style.display = 'block';
-    photo.style.opacity = '1';
-    photo.style.visibility = 'visible';
+    fetch('/assets/rafael-augusto-v7.b64.txt?v=26', {cache:'no-store'})
+      .then(r => {
+        if (!r.ok) throw new Error('Falha ao carregar foto');
+        return r.text();
+      })
+      .then(b64 => {
+        photo.src = 'data:image/jpeg;base64,' + b64.trim();
+      })
+      .catch(() => {
+        photo.src = '/assets/rafael-augusto.jpg?v=26';
+      });
   }
 
   const scrollNav = $('.scroll-nav');
