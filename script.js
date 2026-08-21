@@ -1,146 +1,114 @@
-// ELMAQ v13 — fotos oficiais, navegação, animações e barra interativa
 (() => {
   'use strict';
 
-  // Carrega o ajuste visual da equipe sem depender de CSS antigo.
-  if (!document.querySelector('link[data-elmaq-photo-fix]')) {
-    const photoCss = document.createElement('link');
-    photoCss.rel = 'stylesheet';
-    photoCss.href = 'photo-fix-v13.css?v=13';
-    photoCss.dataset.elmaqPhotoFix = 'true';
-    document.head.appendChild(photoCss);
-  }
-
-  // Usa as fotos oficiais armazenadas como base64 no próprio repositório.
-  // Assim evitamos os JPEGs que estavam chegando parcialmente corrompidos na Vercel.
-  const officialPhotos = [
-    ['img[alt^="Edson Costa"]', 'assets/edson-costa-hq.b64.txt?v=13'],
-    ['img[alt^="Rafael Augusto"]', 'assets/rafael-augusto-v7.b64.txt?v=13'],
-    ['img[alt^="Luis Felipe"]', 'assets/luis-felipe-v7.b64.txt?v=13']
-  ];
-
-  const loadOfficialPhoto = async (selector, source) => {
-    const img = document.querySelector(selector);
-    if (!img) return;
-    try {
-      const response = await fetch(source, { cache: 'no-store' });
-      if (!response.ok) return;
-      const base64 = (await response.text()).trim();
-      if (!base64 || !base64.startsWith('/9j/')) return;
-
-      const probe = new Image();
-      probe.onload = () => {
-        img.src = probe.src;
-        img.dataset.officialPhoto = 'true';
-      };
-      probe.src = 'data:image/jpeg;base64,' + base64;
-    } catch (_) {
-      // Mantém a imagem atual como fallback, sem quebrar o restante do site.
-    }
-  };
-
-  officialPhotos.forEach(([selector, source]) => loadOfficialPhoto(selector, source));
-
-  // Remove somente elementos decorativos antigos de braços robóticos, caso existam.
-  ['.robot-arm','.bg-robot','.robotic-arm','.robot-background'].forEach(sel => {
-    document.querySelectorAll(sel).forEach(el => el.remove());
-  });
-
+  const topbar = document.querySelector('.topbar');
   const mainMenu = document.querySelector('.main-menu');
   const menuToggle = document.querySelector('.menu-toggle');
+  const progressBar = document.querySelector('.scroll-progress span');
+  const sections = [...document.querySelectorAll('.tracked-section')];
+  const navDots = [...document.querySelectorAll('.scroll-nav a')];
+  const menuLinks = [...document.querySelectorAll('.main-menu a[href^="#"]')];
 
   const closeMobileMenu = () => {
     if (!menuToggle || !mainMenu) return;
     menuToggle.classList.remove('active');
     mainMenu.classList.remove('open');
-    menuToggle.setAttribute('aria-expanded','false');
-    menuToggle.setAttribute('aria-label','Abrir menu');
-  };
-
-  const openMobileMenu = () => {
-    if (!menuToggle || !mainMenu) return;
-    menuToggle.classList.add('active');
-    mainMenu.classList.add('open');
-    menuToggle.setAttribute('aria-expanded','true');
-    menuToggle.setAttribute('aria-label','Fechar menu');
+    menuToggle.setAttribute('aria-expanded', 'false');
+    menuToggle.setAttribute('aria-label', 'Abrir menu');
   };
 
   if (menuToggle && mainMenu) {
     menuToggle.addEventListener('click', () => {
-      mainMenu.classList.contains('open') ? closeMobileMenu() : openMobileMenu();
+      const open = mainMenu.classList.toggle('open');
+      menuToggle.classList.toggle('active', open);
+      menuToggle.setAttribute('aria-expanded', String(open));
+      menuToggle.setAttribute('aria-label', open ? 'Fechar menu' : 'Abrir menu');
     });
-    mainMenu.querySelectorAll('a').forEach(a => a.addEventListener('click', closeMobileMenu));
-    document.addEventListener('keydown', e => {
-      if (e.key === 'Escape') closeMobileMenu();
-    });
-    document.addEventListener('click', e => {
-      if (window.innerWidth <= 980 && mainMenu.classList.contains('open') && !mainMenu.contains(e.target) && !menuToggle.contains(e.target)) {
+
+    document.addEventListener('click', event => {
+      if (window.innerWidth <= 780 && mainMenu.classList.contains('open') && !mainMenu.contains(event.target) && !menuToggle.contains(event.target)) {
         closeMobileMenu();
       }
     });
+
+    document.addEventListener('keydown', event => {
+      if (event.key === 'Escape') closeMobileMenu();
+    });
+
     window.addEventListener('resize', () => {
-      if (window.innerWidth > 980) closeMobileMenu();
+      if (window.innerWidth > 780) closeMobileMenu();
     });
   }
 
   document.querySelectorAll('a[href^="#"]').forEach(link => {
-    link.addEventListener('click', e => {
+    link.addEventListener('click', event => {
       const selector = link.getAttribute('href');
       if (!selector || selector === '#') return;
       const target = document.querySelector(selector);
       if (!target) return;
-      e.preventDefault();
-      target.scrollIntoView({behavior:'smooth', block:'start'});
+      event.preventDefault();
+      target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      closeMobileMenu();
     });
   });
 
   const revealItems = document.querySelectorAll('.reveal');
   if ('IntersectionObserver' in window) {
-    const revealObserver = new IntersectionObserver(entries => {
+    const observer = new IntersectionObserver(entries => {
       entries.forEach(entry => {
         if (entry.isIntersecting) {
           entry.target.classList.add('visible');
-          revealObserver.unobserve(entry.target);
+          observer.unobserve(entry.target);
         }
       });
-    }, {threshold:.12});
-    revealItems.forEach(el => revealObserver.observe(el));
+    }, { threshold: 0.12, rootMargin: '0px 0px -4% 0px' });
+    revealItems.forEach(item => observer.observe(item));
   } else {
-    revealItems.forEach(el => el.classList.add('visible'));
+    revealItems.forEach(item => item.classList.add('visible'));
   }
 
-  const progressBar = document.querySelector('.scroll-progress span');
-  const sections = [...document.querySelectorAll('.tracked-section')];
-  const navDots = [...document.querySelectorAll('.scroll-nav a')];
   let ticking = false;
 
-  const updateScrollUI = () => {
+  const updateUi = () => {
     const doc = document.documentElement;
-    const scrollTop = window.scrollY || doc.scrollTop;
-    const docHeight = Math.max(1, doc.scrollHeight - window.innerHeight);
-    const pct = Math.min(100, Math.max(0, (scrollTop / docHeight) * 100));
-    if (progressBar) progressBar.style.height = pct + '%';
+    const scrollTop = window.scrollY || doc.scrollTop || 0;
+    const total = Math.max(1, doc.scrollHeight - window.innerHeight);
+    const percent = Math.min(100, Math.max(0, scrollTop / total * 100));
 
-    const marker = scrollTop + Math.min(window.innerHeight * .38, 260);
-    let current = sections.length ? sections[0].id : 'inicio';
-    for (const section of sections) {
-      if (section.offsetTop <= marker) current = section.id;
-      else break;
-    }
-    navDots.forEach(dot => {
-      dot.classList.toggle('active', dot.getAttribute('href') === '#' + current);
+    if (progressBar) progressBar.style.height = percent + '%';
+    if (topbar) topbar.classList.toggle('scrolled', scrollTop > 24);
+
+    const marker = scrollTop + Math.min(window.innerHeight * 0.36, 260);
+    let currentId = sections[0]?.id || 'inicio';
+    sections.forEach(section => {
+      if (section.offsetTop <= marker) currentId = section.id;
     });
+
+    navDots.forEach(dot => {
+      const active = dot.getAttribute('href') === '#' + currentId;
+      dot.classList.toggle('active', active);
+      if (active) dot.setAttribute('aria-current', 'true');
+      else dot.removeAttribute('aria-current');
+    });
+
+    menuLinks.forEach(link => {
+      const active = link.getAttribute('href') === '#' + currentId;
+      link.classList.toggle('active', active);
+      if (active) link.setAttribute('aria-current', 'page');
+      else link.removeAttribute('aria-current');
+    });
+
     ticking = false;
   };
 
-  const requestScrollUpdate = () => {
+  const requestUpdate = () => {
     if (ticking) return;
-    requestAnimationFrame(updateScrollUI);
     ticking = true;
+    requestAnimationFrame(updateUi);
   };
 
-  window.addEventListener('scroll', requestScrollUpdate, {passive:true});
-  window.addEventListener('resize', requestScrollUpdate);
-  window.addEventListener('load', requestScrollUpdate);
-  requestScrollUpdate();
+  window.addEventListener('scroll', requestUpdate, { passive: true });
+  window.addEventListener('resize', requestUpdate);
+  window.addEventListener('load', requestUpdate);
+  requestUpdate();
 })();
