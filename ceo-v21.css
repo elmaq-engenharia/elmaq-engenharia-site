@@ -1,0 +1,22 @@
+/* ELMAQ v21 — bloco estratégico da diretoria */
+.ceo-section{position:relative;overflow:hidden;background:radial-gradient(circle at 15% 20%,rgba(0,145,255,.16),transparent 34%),linear-gradient(180deg,#06121d 0%,#02070b 100%);border-top:1px solid rgba(54,180,255,.16);border-bottom:1px solid rgba(54,180,255,.16)}
+.ceo-section:before{content:"";position:absolute;inset:0;pointer-events:none;background-image:linear-gradient(rgba(58,176,255,.045) 1px,transparent 1px),linear-gradient(90deg,rgba(58,176,255,.045) 1px,transparent 1px);background-size:54px 54px;mask-image:linear-gradient(to bottom,rgba(0,0,0,.72),transparent)}
+.ceo-wrap{position:relative;z-index:1;display:grid;grid-template-columns:minmax(320px,.92fr) minmax(0,1.08fr);gap:44px;align-items:stretch}
+.ceo-photo{position:relative;min-height:460px;border:1px solid rgba(45,177,255,.48);border-radius:18px;overflow:hidden;background:#000;box-shadow:0 28px 70px rgba(0,0,0,.45),0 0 0 1px rgba(24,149,235,.08) inset}
+.ceo-photo img{display:block;width:100%;height:100%;min-height:460px;object-fit:cover;object-position:center 30%;filter:contrast(1.03) saturate(.98)}
+.ceo-photo:after{content:"";position:absolute;inset:auto 0 0;height:35%;background:linear-gradient(transparent,rgba(1,7,12,.6));pointer-events:none}
+.ceo-copy{display:flex;flex-direction:column;justify-content:center;padding:38px 8px 38px 0}
+.ceo-kicker{display:inline-flex;align-items:center;gap:10px;width:max-content;margin-bottom:18px;padding:8px 12px;border:1px solid rgba(49,182,255,.42);border-radius:999px;color:#67c8ff;background:rgba(0,134,219,.08);font-weight:800;font-size:.78rem;letter-spacing:.15em;text-transform:uppercase}
+.ceo-kicker:before{content:"";width:8px;height:8px;border-radius:50%;background:#24b7ff;box-shadow:0 0 16px rgba(36,183,255,.75)}
+.ceo-copy h2{margin:0 0 6px;font-size:clamp(2.7rem,5.3vw,5.6rem);line-height:.92;letter-spacing:-.055em;color:#fff}
+.ceo-role{margin:0 0 24px;color:#2ebdff;font-size:1.04rem;font-weight:900;letter-spacing:.075em;text-transform:uppercase}
+.ceo-copy .ceo-lead{max-width:720px;margin:0 0 26px;color:#bed2df;font-size:1.08rem;line-height:1.72}
+.ceo-proof{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin:0 0 28px}
+.ceo-proof span{padding:14px 13px;border:1px solid rgba(93,183,236,.18);border-radius:12px;background:rgba(8,30,44,.62);color:#dcecf5;font-size:.9rem;font-weight:750;text-align:center}
+.ceo-actions{display:flex;flex-wrap:wrap;gap:12px;align-items:center}
+.ceo-actions .ceo-phone{display:inline-flex;align-items:center;gap:9px;color:#fff;text-decoration:none;font-weight:900;padding:13px 18px;border:1px solid rgba(48,185,255,.55);border-radius:10px;background:rgba(0,144,225,.1);transition:.2s ease}
+.ceo-actions .ceo-phone:hover{transform:translateY(-2px);background:rgba(0,155,238,.18);border-color:#35bcff}
+.ceo-actions .btn{margin:0}
+.scroll-nav a[href="#diretoria"]:after{content:"Diretoria"}
+@media(max-width:960px){.ceo-wrap{grid-template-columns:1fr;gap:24px}.ceo-photo{min-height:420px}.ceo-photo img{min-height:420px}.ceo-copy{padding:8px 0 20px}.ceo-proof{grid-template-columns:1fr 1fr 1fr}}
+@media(max-width:640px){.ceo-section{padding-top:64px;padding-bottom:64px}.ceo-photo{min-height:360px;border-radius:14px}.ceo-photo img{min-height:360px;object-position:center 28%}.ceo-copy h2{font-size:3.4rem}.ceo-lead{font-size:1rem!important}.ceo-proof{grid-template-columns:1fr}.ceo-actions{align-items:stretch}.ceo-actions .btn,.ceo-actions .ceo-phone{width:100%;justify-content:center;text-align:center}}
