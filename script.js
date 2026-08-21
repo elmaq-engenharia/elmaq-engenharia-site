@@ -8,7 +8,7 @@
     s.onerror = () => done && done();
     document.head.appendChild(s);
   };
-  load('ceo-v21.js?v=24', () => {
-    load('rafael-v22.js?v=24', () => load('script-core-v20.js?v=24'));
+  load('ceo-v21.js?v=25', () => {
+    load('rafael-v22.js?v=25', () => load('script-core-v20.js?v=25'));
   });
 })();
