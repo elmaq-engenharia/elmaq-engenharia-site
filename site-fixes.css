@@ -1,20 +1,20 @@
-/* Correções gerais ELMAQ v8 */
+/* Correções gerais ELMAQ v9 */
 html{scroll-behavior:smooth;scroll-padding-top:82px}
 body{background:#05070a}
-.brand-image{display:flex;align-items:center;flex:0 0 auto}
-.brand-image img{width:188px!important;height:64px!important;object-fit:contain!important;background:#fff!important;border-radius:8px!important;padding:2px!important;box-shadow:0 0 0 1px rgba(40,184,255,.18)}
-.section-logo{width:132px!important;height:64px!important;object-fit:contain!important;background:#fff!important;border-radius:8px!important;padding:3px!important;opacity:.96!important;box-shadow:0 10px 28px rgba(0,0,0,.25)}
-.footer-logo{width:190px!important;height:auto!important;object-fit:contain!important;background:#fff!important;border-radius:8px!important;padding:3px!important}
+.brand-image{width:230px!important;height:72px!important;overflow:hidden!important;background:#fff!important;border-radius:9px!important;display:flex!important;align-items:center!important;justify-content:center!important;flex:0 0 auto!important;box-shadow:0 0 0 1px rgba(40,184,255,.22),0 10px 26px rgba(0,0,0,.28)!important}
+.brand-image img{width:100%!important;height:100%!important;object-fit:cover!important;object-position:center 52%!important;padding:0!important;border-radius:0!important;background:#fff!important;box-shadow:none!important}
+.section-logo{width:160px!important;height:60px!important;object-fit:cover!important;object-position:center 52%!important;background:#fff!important;border-radius:8px!important;padding:0!important;opacity:.96!important;box-shadow:0 10px 28px rgba(0,0,0,.25)!important}
+.footer-logo{width:240px!important;height:78px!important;object-fit:cover!important;object-position:center 52%!important;background:#fff!important;border-radius:8px!important;padding:0!important}
 .scroll-progress{position:fixed!important;top:0!important;right:0!important;left:auto!important;width:5px!important;height:100vh!important;z-index:9999!important;background:rgba(255,255,255,.08)!important;pointer-events:none}
 .scroll-progress span{display:block!important;width:100%!important;height:0;background:linear-gradient(180deg,#28b8ff 0%,#0787d8 48%,#0054ad 100%)!important;box-shadow:0 0 18px rgba(40,184,255,.65)!important;border-radius:999px!important;transition:height .12s linear!important}
-.scroll-nav{right:18px!important;z-index:9998!important}
-.scroll-nav a{width:12px!important;height:12px!important;background:#183141!important;border:1px solid #5d8ba7!important;transition:transform .2s ease,background .2s ease,box-shadow .2s ease!important}
-.scroll-nav a.active,.scroll-nav a:hover{background:#28b8ff!important;transform:scale(1.35)!important;box-shadow:0 0 0 5px rgba(40,184,255,.13),0 0 18px rgba(40,184,255,.48)!important}
+.scroll-nav{right:16px!important;z-index:9998!important}
+.scroll-nav a{width:11px!important;height:11px!important;background:#183141!important;border:1px solid #5d8ba7!important;transition:transform .2s ease,background .2s ease,box-shadow .2s ease!important}
+.scroll-nav a.active,.scroll-nav a:hover{background:#28b8ff!important;transform:scale(1.28)!important;box-shadow:0 0 0 5px rgba(40,184,255,.13),0 0 18px rgba(40,184,255,.48)!important}
 .robot-arm,.bg-robot,.robotic-arm,.robot-background{display:none!important;background-image:none!important}
-.topbar{min-height:78px!important;background:rgba(3,6,9,.96)!important;border-bottom:1px solid #132435!important}
+.topbar{min-height:86px!important;background:rgba(3,6,9,.97)!important;border-bottom:1px solid #132435!important;padding-top:7px!important;padding-bottom:7px!important}
 .main-menu a{transition:color .2s ease,transform .2s ease}.main-menu a:hover{color:#28b8ff!important;transform:translateY(-1px)}
 .hero-media img,.feature-media img{background:#000!important;border:1px solid rgba(40,184,255,.16)!important}
-.elmaq-team{background:#030507!important}.elmaq-person{background:#020406!important;border-color:#165b8f!important}.elmaq-person-media img{object-fit:contain!important;object-position:center bottom!important}
-@media(max-width:1100px){.topbar{gap:14px!important}.topbar nav{gap:14px!important}.brand-image img{width:160px!important;height:56px!important}}
-@media(max-width:980px){.brand-image img{width:145px!important;height:52px!important}.section-logo{width:112px!important;height:54px!important}.scroll-nav{right:10px!important}}
-@media(max-width:650px){.brand-image img{width:126px!important;height:48px!important}.section-logo{width:110px!important;height:52px!important}.scroll-progress{width:4px!important}.scroll-nav{display:none!important}}
+.elmaq-team{background:#030507!important}.elmaq-person{background:#020406!important;border-color:#165b8f!important}.elmaq-person-media img{object-fit:cover!important;object-position:center top!important;background:#000!important}.elmaq-person:nth-child(1) .elmaq-person-media img{object-position:center center!important}.elmaq-person:nth-child(2) .elmaq-person-media img{object-position:center top!important}.elmaq-person:nth-child(3) .elmaq-person-media img{object-position:center top!important}
+@media(max-width:1100px){.topbar{gap:14px!important}.topbar nav{gap:14px!important}.brand-image{width:190px!important;height:60px!important}}
+@media(max-width:980px){.brand-image{width:170px!important;height:56px!important}.section-logo{width:135px!important;height:54px!important}.scroll-nav{right:10px!important}}
+@media(max-width:650px){.brand-image{width:145px!important;height:50px!important}.section-logo{width:122px!important;height:48px!important}.footer-logo{width:200px!important;height:66px!important}.scroll-progress{width:4px!important}.scroll-nav{display:none!important}.topbar{min-height:68px!important}}
