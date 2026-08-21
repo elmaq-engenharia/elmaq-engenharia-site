@@ -1,6 +1,45 @@
-// ELMAQ v8 — navegação, animações e barra interativa
+// ELMAQ v13 — fotos oficiais, navegação, animações e barra interativa
 (() => {
   'use strict';
+
+  // Carrega o ajuste visual da equipe sem depender de CSS antigo.
+  if (!document.querySelector('link[data-elmaq-photo-fix]')) {
+    const photoCss = document.createElement('link');
+    photoCss.rel = 'stylesheet';
+    photoCss.href = 'photo-fix-v13.css?v=13';
+    photoCss.dataset.elmaqPhotoFix = 'true';
+    document.head.appendChild(photoCss);
+  }
+
+  // Usa as fotos oficiais armazenadas como base64 no próprio repositório.
+  // Assim evitamos os JPEGs que estavam chegando parcialmente corrompidos na Vercel.
+  const officialPhotos = [
+    ['img[alt^="Edson Costa"]', 'assets/edson-costa-hq.b64.txt?v=13'],
+    ['img[alt^="Rafael Augusto"]', 'assets/rafael-augusto-v7.b64.txt?v=13'],
+    ['img[alt^="Luis Felipe"]', 'assets/luis-felipe-v7.b64.txt?v=13']
+  ];
+
+  const loadOfficialPhoto = async (selector, source) => {
+    const img = document.querySelector(selector);
+    if (!img) return;
+    try {
+      const response = await fetch(source, { cache: 'no-store' });
+      if (!response.ok) return;
+      const base64 = (await response.text()).trim();
+      if (!base64 || !base64.startsWith('/9j/')) return;
+
+      const probe = new Image();
+      probe.onload = () => {
+        img.src = probe.src;
+        img.dataset.officialPhoto = 'true';
+      };
+      probe.src = 'data:image/jpeg;base64,' + base64;
+    } catch (_) {
+      // Mantém a imagem atual como fallback, sem quebrar o restante do site.
+    }
+  };
+
+  officialPhotos.forEach(([selector, source]) => loadOfficialPhoto(selector, source));
 
   // Remove somente elementos decorativos antigos de braços robóticos, caso existam.
   ['.robot-arm','.bg-robot','.robotic-arm','.robot-background'].forEach(sel => {
@@ -44,7 +83,6 @@
     });
   }
 
-  // Rolagem suave para âncoras internas.
   document.querySelectorAll('a[href^="#"]').forEach(link => {
     link.addEventListener('click', e => {
       const selector = link.getAttribute('href');
@@ -56,7 +94,6 @@
     });
   });
 
-  // Revelação dos blocos ao entrar na tela.
   const revealItems = document.querySelectorAll('.reveal');
   if ('IntersectionObserver' in window) {
     const revealObserver = new IntersectionObserver(entries => {
@@ -72,7 +109,6 @@
     revealItems.forEach(el => el.classList.add('visible'));
   }
 
-  // Barra vertical de progresso e pontos sincronizados com a seção atual.
   const progressBar = document.querySelector('.scroll-progress span');
   const sections = [...document.querySelectorAll('.tracked-section')];
   const navDots = [...document.querySelectorAll('.scroll-nav a')];
