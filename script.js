@@ -4,6 +4,25 @@
   const $ = (s, c=document) => c.querySelector(s);
   const $$ = (s, c=document) => [...c.querySelectorAll(s)];
 
+  // Logo oficial ELMAQ em toda a estrutura visual do site.
+  const officialLogo = 'assets/logo-elmaq-oficial.jpg?v=16';
+  $$('img').forEach(img => {
+    const src = img.getAttribute('src') || '';
+    const cls = img.className || '';
+    if (src.includes('logo-elmaq') || cls.includes('footer-logo') || img.closest('.brand')) {
+      img.src = officialLogo;
+      img.alt = 'ELMAQ Engenharia e Máquinas para Artefatos de Concreto';
+      img.decoding = 'async';
+    }
+  });
+  const favicon = document.querySelector('link[rel="icon"]');
+  if (favicon) {
+    favicon.type = 'image/jpeg';
+    favicon.href = officialLogo;
+  }
+  const ogImage = document.querySelector('meta[property="og:image"]');
+  if (ogImage) ogImage.content = 'https://elmaq-engenharia-site.vercel.app/assets/logo-elmaq-oficial.jpg?v=16';
+
   const menuBtn = $('.menu-button');
   const mega = $('#mega-menu');
   const megaClose = $('.mega-close');
