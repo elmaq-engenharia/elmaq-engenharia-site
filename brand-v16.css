@@ -1,0 +1,7 @@
+/* ELMAQ v16 — enquadramento oficial da nova marca */
+.brand img,.footer-logo,.mega-brand-logo,.contact-brand-logo{display:block;object-fit:contain;object-position:center;background:#fff;border-radius:8px;padding:3px;box-shadow:0 8px 26px rgba(0,0,0,.2)}
+.brand{width:205px;display:flex;align-items:center}.brand img{width:100%;height:58px}
+.footer-logo{width:250px;height:auto}
+.mega-brand-logo{width:220px;max-width:48vw;margin:0 0 18px}
+.contact-brand-logo{width:260px;max-width:100%;margin:0 0 22px}
+@media(max-width:780px){.brand{width:158px}.brand img{height:48px}.footer-logo{width:220px}.mega-brand-logo{width:180px}.contact-brand-logo{width:220px}}
