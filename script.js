@@ -1,114 +1,122 @@
 (() => {
   'use strict';
 
-  const topbar = document.querySelector('.topbar');
-  const mainMenu = document.querySelector('.main-menu');
-  const menuToggle = document.querySelector('.menu-toggle');
-  const progressBar = document.querySelector('.scroll-progress span');
-  const sections = [...document.querySelectorAll('.tracked-section')];
-  const navDots = [...document.querySelectorAll('.scroll-nav a')];
-  const menuLinks = [...document.querySelectorAll('.main-menu a[href^="#"]')];
+  const $ = (s, c=document) => c.querySelector(s);
+  const $$ = (s, c=document) => [...c.querySelectorAll(s)];
 
-  const closeMobileMenu = () => {
-    if (!menuToggle || !mainMenu) return;
-    menuToggle.classList.remove('active');
-    mainMenu.classList.remove('open');
-    menuToggle.setAttribute('aria-expanded', 'false');
-    menuToggle.setAttribute('aria-label', 'Abrir menu');
+  const menuBtn = $('.menu-button');
+  const mega = $('#mega-menu');
+  const megaClose = $('.mega-close');
+  const setMenu = open => {
+    if (!mega || !menuBtn) return;
+    mega.classList.toggle('open', open);
+    mega.setAttribute('aria-hidden', String(!open));
+    menuBtn.setAttribute('aria-expanded', String(open));
+    document.body.classList.toggle('menu-open', open);
   };
+  menuBtn?.addEventListener('click', () => setMenu(!mega.classList.contains('open')));
+  megaClose?.addEventListener('click', () => setMenu(false));
+  mega?.addEventListener('click', e => { if (e.target === mega) setMenu(false); });
+  $$('#mega-menu a').forEach(a => a.addEventListener('click', () => setMenu(false)));
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') { setMenu(false); closeGallery(); } });
 
-  if (menuToggle && mainMenu) {
-    menuToggle.addEventListener('click', () => {
-      const open = mainMenu.classList.toggle('open');
-      menuToggle.classList.toggle('active', open);
-      menuToggle.setAttribute('aria-expanded', String(open));
-      menuToggle.setAttribute('aria-label', open ? 'Fechar menu' : 'Abrir menu');
-    });
-
-    document.addEventListener('click', event => {
-      if (window.innerWidth <= 780 && mainMenu.classList.contains('open') && !mainMenu.contains(event.target) && !menuToggle.contains(event.target)) {
-        closeMobileMenu();
-      }
-    });
-
-    document.addEventListener('keydown', event => {
-      if (event.key === 'Escape') closeMobileMenu();
-    });
-
-    window.addEventListener('resize', () => {
-      if (window.innerWidth > 780) closeMobileMenu();
-    });
-  }
-
-  document.querySelectorAll('a[href^="#"]').forEach(link => {
-    link.addEventListener('click', event => {
-      const selector = link.getAttribute('href');
-      if (!selector || selector === '#') return;
-      const target = document.querySelector(selector);
+  $$('a[href^="#"]').forEach(link => {
+    link.addEventListener('click', e => {
+      const id = link.getAttribute('href');
+      if (!id || id === '#') return;
+      const target = $(id);
       if (!target) return;
-      event.preventDefault();
-      target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      closeMobileMenu();
+      e.preventDefault();
+      target.scrollIntoView({behavior:'smooth', block:'start'});
     });
   });
 
-  const revealItems = document.querySelectorAll('.reveal');
+  const reveal = $$('.reveal');
   if ('IntersectionObserver' in window) {
-    const observer = new IntersectionObserver(entries => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('visible');
-          observer.unobserve(entry.target);
-        }
-      });
-    }, { threshold: 0.12, rootMargin: '0px 0px -4% 0px' });
-    revealItems.forEach(item => observer.observe(item));
-  } else {
-    revealItems.forEach(item => item.classList.add('visible'));
-  }
+    const ro = new IntersectionObserver(entries => entries.forEach(entry => {
+      if (entry.isIntersecting) { entry.target.classList.add('visible'); ro.unobserve(entry.target); }
+    }), {threshold:.08});
+    reveal.forEach(el => ro.observe(el));
+  } else reveal.forEach(el => el.classList.add('visible'));
 
+  const progress = $('.scroll-progress span');
+  const sections = $$('.tracked-section');
+  const dots = $$('.scroll-nav a');
+  const topLinks = $$('.desktop-nav a');
+  const backTop = $('.back-top');
   let ticking = false;
 
-  const updateUi = () => {
+  function updateScroll(){
     const doc = document.documentElement;
-    const scrollTop = window.scrollY || doc.scrollTop || 0;
-    const total = Math.max(1, doc.scrollHeight - window.innerHeight);
-    const percent = Math.min(100, Math.max(0, scrollTop / total * 100));
-
-    if (progressBar) progressBar.style.height = percent + '%';
-    if (topbar) topbar.classList.toggle('scrolled', scrollTop > 24);
-
-    const marker = scrollTop + Math.min(window.innerHeight * 0.36, 260);
-    let currentId = sections[0]?.id || 'inicio';
-    sections.forEach(section => {
-      if (section.offsetTop <= marker) currentId = section.id;
+    const y = window.scrollY || doc.scrollTop;
+    const max = Math.max(1, doc.scrollHeight - innerHeight);
+    if (progress) progress.style.height = Math.min(100, (y/max)*100) + '%';
+    backTop?.classList.toggle('show', y > 650);
+    const marker = y + Math.min(innerHeight*.38, 280);
+    let current = sections[0]?.id || 'inicio';
+    sections.forEach(s => { if (s.offsetTop <= marker) current = s.id; });
+    dots.forEach(d => d.classList.toggle('active', d.getAttribute('href') === '#'+current));
+    topLinks.forEach(a => {
+      const target = a.getAttribute('href')?.slice(1);
+      const active = target === current || (target === 'linhas' && ['e4000','e5000','e6000'].includes(current));
+      a.classList.toggle('active', active);
     });
-
-    navDots.forEach(dot => {
-      const active = dot.getAttribute('href') === '#' + currentId;
-      dot.classList.toggle('active', active);
-      if (active) dot.setAttribute('aria-current', 'true');
-      else dot.removeAttribute('aria-current');
-    });
-
-    menuLinks.forEach(link => {
-      const active = link.getAttribute('href') === '#' + currentId;
-      link.classList.toggle('active', active);
-      if (active) link.setAttribute('aria-current', 'page');
-      else link.removeAttribute('aria-current');
-    });
-
     ticking = false;
-  };
+  }
+  function requestScroll(){ if (!ticking) { ticking = true; requestAnimationFrame(updateScroll); } }
+  addEventListener('scroll', requestScroll, {passive:true});
+  addEventListener('resize', requestScroll);
+  addEventListener('load', requestScroll);
+  requestScroll();
+  backTop?.addEventListener('click', () => scrollTo({top:0,behavior:'smooth'}));
 
-  const requestUpdate = () => {
-    if (ticking) return;
-    ticking = true;
-    requestAnimationFrame(updateUi);
-  };
+  const filterButtons = $$('.gallery-filters button');
+  const items = $$('.gallery-item');
+  filterButtons.forEach(btn => btn.addEventListener('click', () => {
+    filterButtons.forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    const f = btn.dataset.filter;
+    items.forEach(item => item.classList.toggle('hidden', f !== 'all' && item.dataset.category !== f));
+  }));
 
-  window.addEventListener('scroll', requestUpdate, { passive: true });
-  window.addEventListener('resize', requestUpdate);
-  window.addEventListener('load', requestUpdate);
-  requestUpdate();
+  const modal = $('.gallery-modal');
+  const modalImg = $('.gallery-modal img');
+  const modalCaption = $('.gallery-modal figcaption');
+  let visibleItems = items;
+  let currentIndex = 0;
+  const refreshVisible = () => visibleItems = items.filter(i => !i.classList.contains('hidden'));
+  function showGallery(item){
+    refreshVisible();
+    currentIndex = Math.max(0, visibleItems.indexOf(item));
+    const active = visibleItems[currentIndex];
+    if (!modal || !active) return;
+    modalImg.src = active.dataset.src;
+    modalImg.alt = active.dataset.title || '';
+    modalCaption.textContent = active.dataset.title || '';
+    modal.classList.add('open');
+    modal.setAttribute('aria-hidden','false');
+    document.body.classList.add('menu-open');
+  }
+  function closeGallery(){
+    if (!modal?.classList.contains('open')) return;
+    modal.classList.remove('open');
+    modal.setAttribute('aria-hidden','true');
+    document.body.classList.remove('menu-open');
+  }
+  function moveGallery(dir){
+    refreshVisible();
+    if (!visibleItems.length) return;
+    currentIndex = (currentIndex + dir + visibleItems.length) % visibleItems.length;
+    showGallery(visibleItems[currentIndex]);
+  }
+  items.forEach(i => i.addEventListener('click', () => showGallery(i)));
+  $('.modal-close')?.addEventListener('click', closeGallery);
+  $('.modal-prev')?.addEventListener('click', () => moveGallery(-1));
+  $('.modal-next')?.addEventListener('click', () => moveGallery(1));
+  modal?.addEventListener('click', e => { if (e.target === modal) closeGallery(); });
+  document.addEventListener('keydown', e => {
+    if (!modal?.classList.contains('open')) return;
+    if (e.key === 'ArrowLeft') moveGallery(-1);
+    if (e.key === 'ArrowRight') moveGallery(1);
+  });
 })();
