@@ -2,11 +2,11 @@
   'use strict';
   const $ = (s, c=document) => c.querySelector(s);
 
-  if (!document.querySelector('link[data-elmaq-rafael-v26]')) {
+  if (!document.querySelector('link[data-elmaq-rafael-v28]')) {
     const css = document.createElement('link');
     css.rel = 'stylesheet';
-    css.href = 'rafael-v22.css?v=26';
-    css.dataset.elmaqRafaelV26 = 'true';
+    css.href = 'rafael-v22.css?v=28';
+    css.dataset.elmaqRafaelV28 = 'true';
     document.head.appendChild(css);
   }
 
@@ -19,14 +19,14 @@
     section.innerHTML = `
       <div class="wrap technical-director-wrap reveal visible">
         <div class="technical-director-photo">
-          <img id="rafael-photo" alt="Rafael Augusto, Diretor Técnico de Produção da ELMAQ Engenharia" loading="eager" decoding="sync" style="display:block!important;opacity:1!important;visibility:visible!important;width:100%;height:100%;object-fit:cover;object-position:center 25%;">
+          <img id="rafael-photo" src="/assets/rafael-augusto-v28.webp?v=28" alt="Rafael Augusto, Diretor Técnico de Produção da ELMAQ Engenharia" loading="eager" decoding="async" fetchpriority="high" style="display:block!important;opacity:1!important;visibility:visible!important;width:100%;height:100%;object-fit:cover;object-position:center 25%;">
         </div>
         <div class="technical-director-data">
           <span class="technical-director-kicker">Direção Técnica</span>
           <h2>Rafael Augusto</h2>
           <p class="technical-director-role">Diretor Técnico de Produção</p>
           <div class="technical-director-contact">
-            <span>Telefone</span>
+            <span>Telefone e WhatsApp</span>
             <a href="tel:+5531985980441">(31) 98598-0441</a>
           </div>
           <div class="technical-director-actions">
@@ -39,17 +39,10 @@
 
   const photo = $('#rafael-photo');
   if (photo) {
-    fetch('/assets/rafael-augusto-v7.b64.txt?v=26', {cache:'no-store'})
-      .then(r => {
-        if (!r.ok) throw new Error('Falha ao carregar foto');
-        return r.text();
-      })
-      .then(b64 => {
-        photo.src = 'data:image/jpeg;base64,' + b64.trim();
-      })
-      .catch(() => {
-        photo.src = '/assets/rafael-augusto.jpg?v=26';
-      });
+    photo.onerror = () => {
+      photo.onerror = null;
+      photo.src = '/assets/rafael-augusto.jpg?v=28';
+    };
   }
 
   const scrollNav = $('.scroll-nav');
