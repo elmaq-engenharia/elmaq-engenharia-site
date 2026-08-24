@@ -2,11 +2,11 @@
   'use strict';
   const $ = (s,c=document) => c.querySelector(s);
 
-  if (!document.querySelector('link[data-elmaq-edson-v27]')) {
+  if (!document.querySelector('link[data-elmaq-edson-v29]')) {
     const css = document.createElement('link');
     css.rel = 'stylesheet';
-    css.href = 'edson-v27.css?v=27';
-    css.dataset.elmaqEdsonV27 = 'true';
+    css.href = 'edson-v27.css?v=29';
+    css.dataset.elmaqEdsonV29 = 'true';
     document.head.appendChild(css);
   }
 
@@ -34,7 +34,7 @@
           </div>
         </div>
         <div class="commercial-director-photo" aria-label="Edson Costa, Engenharia Comercial da ELMAQ Engenharia">
-          <img id="edson-commercial-photo" alt="Edson Costa, Engenharia Comercial da ELMAQ Engenharia" loading="eager" decoding="async" fetchpriority="high">
+          <img id="edson-commercial-photo" src="/assets/edson-costa-v29.webp?v=29" alt="Edson Costa, Engenharia Comercial da ELMAQ Engenharia" loading="eager" decoding="async" fetchpriority="high">
           <div class="commercial-director-signature"><strong>Edson Costa</strong><span>Engenharia Comercial</span></div>
         </div>
       </div>`;
@@ -42,16 +42,11 @@
   }
 
   const photo = $('#edson-commercial-photo');
-  if (photo && !photo.src) {
-    fetch('assets/edson-costa-v27.b64.txt?v=27', {cache:'no-store'})
-      .then(r => { if (!r.ok) throw new Error('foto'); return r.text(); })
-      .then(data => {
-        const clean = data.replace(/\s+/g,'');
-        photo.src = 'data:image/jpeg;base64,' + clean;
-      })
-      .catch(() => {
-        photo.src = 'assets/edson-costa.jpg?v=27';
-      });
+  if (photo) {
+    photo.onerror = () => {
+      photo.onerror = null;
+      photo.src = '/assets/edson-costa.jpg?v=29';
+    };
   }
 
   const desktopNav = $('.desktop-nav');
