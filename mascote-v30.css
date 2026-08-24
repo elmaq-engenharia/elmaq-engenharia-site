@@ -1,0 +1,26 @@
+/* ELMAQ v30 — mascote comercial interativo */
+.elmaq-mascot{position:fixed;left:10px;bottom:0;z-index:94;width:190px;height:270px;opacity:0;transform:translateY(28px);transition:opacity .35s ease,transform .35s ease;pointer-events:none}
+.elmaq-mascot.is-ready{opacity:1;transform:translateY(0)}
+.elmaq-mascot-trigger{position:absolute;inset:0;display:block;width:100%;height:100%;padding:0;border:0;background:transparent;cursor:pointer;pointer-events:auto;filter:drop-shadow(0 18px 20px rgba(0,0,0,.46))}
+.elmaq-mascot-trigger img{display:block;width:100%;height:100%;object-fit:contain;object-position:center bottom;animation:elmaq-mascot-float 4.2s ease-in-out infinite}
+.elmaq-mascot-label{position:absolute;top:44px;right:-48px;padding:9px 12px;border:1px solid rgba(72,199,255,.55);border-radius:999px;background:rgba(4,22,35,.94);box-shadow:0 12px 32px rgba(0,0,0,.38);color:#fff;font-size:11px;font-weight:900;letter-spacing:.03em;white-space:nowrap;transition:opacity .2s ease,transform .2s ease}
+.elmaq-mascot-label::before{position:absolute;left:-6px;top:50%;width:10px;height:10px;border-left:1px solid rgba(72,199,255,.55);border-bottom:1px solid rgba(72,199,255,.55);background:rgba(4,22,35,.94);content:"";transform:translateY(-50%) rotate(45deg)}
+.elmaq-mascot.is-open .elmaq-mascot-label{opacity:0;transform:translateX(-8px)}
+.elmaq-mascot-pulse{position:absolute;top:18px;left:33px;width:13px;height:13px;border:3px solid #032015;border-radius:50%;background:#31dc8b;box-shadow:0 0 0 0 rgba(49,220,139,.62);animation:elmaq-mascot-pulse 2s infinite}
+.elmaq-mascot-panel{position:absolute;left:162px;bottom:72px;width:min(360px,calc(100vw - 205px));padding:21px;border:1px solid rgba(67,190,255,.42);border-radius:18px;background:linear-gradient(145deg,rgba(5,25,40,.98),rgba(2,11,19,.98));box-shadow:0 24px 65px rgba(0,0,0,.52);color:#fff;opacity:0;visibility:hidden;transform:translate(-12px,12px) scale(.96);transform-origin:left bottom;transition:opacity .22s ease,visibility .22s ease,transform .22s ease;pointer-events:none}
+.elmaq-mascot.is-open .elmaq-mascot-panel{opacity:1;visibility:visible;transform:translate(0) scale(1);pointer-events:auto}
+.elmaq-mascot-panel::before{position:absolute;left:-10px;bottom:52px;width:18px;height:18px;border-left:1px solid rgba(67,190,255,.42);border-bottom:1px solid rgba(67,190,255,.42);background:#061a29;content:"";transform:rotate(45deg)}
+.elmaq-mascot-close{position:absolute;top:11px;right:11px;width:32px;height:32px;border:1px solid rgba(255,255,255,.16);border-radius:50%;background:rgba(255,255,255,.06);color:#fff;font-size:19px;line-height:1;cursor:pointer}
+.elmaq-mascot-kicker{display:block;margin:0 38px 10px 0;color:#46c7ff;font-size:10px;font-weight:900;letter-spacing:.14em;text-transform:uppercase}
+.elmaq-mascot-panel strong{display:block;margin:0 0 10px;font-size:clamp(21px,2.2vw,28px);line-height:1.05;letter-spacing:-.025em}
+.elmaq-mascot-panel p{margin:0;color:#aac0ce;font-size:13px;line-height:1.55}
+.elmaq-mascot-actions{display:grid;margin-top:17px;gap:8px}
+.elmaq-mascot-actions a{display:flex;min-height:44px;padding:0 15px;border:1px solid rgba(69,193,255,.42);border-radius:10px;align-items:center;justify-content:space-between;color:#fff;font-size:12px;font-weight:900;text-decoration:none;transition:transform .18s ease,background .18s ease}
+.elmaq-mascot-actions a:hover{transform:translateY(-2px);background:rgba(41,177,244,.12)}
+.elmaq-mascot-actions .elmaq-mascot-primary{border-color:#2bd27e;background:#2bd27e;color:#032416}
+.elmaq-mascot-actions .elmaq-mascot-primary:hover{background:#43e795}
+@keyframes elmaq-mascot-float{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
+@keyframes elmaq-mascot-pulse{0%{box-shadow:0 0 0 0 rgba(49,220,139,.62)}70%{box-shadow:0 0 0 12px rgba(49,220,139,0)}100%{box-shadow:0 0 0 0 rgba(49,220,139,0)}}
+@media(max-width:720px){.elmaq-mascot{left:4px;width:118px;height:178px}.elmaq-mascot-label{top:20px;right:-72px;font-size:10px}.elmaq-mascot-pulse{top:8px;left:18px}.elmaq-mascot-panel{left:10px;bottom:166px;width:min(342px,calc(100vw - 28px));padding:19px;transform-origin:left bottom}.elmaq-mascot-panel::before{left:35px;bottom:-10px;border:0;border-right:1px solid rgba(67,190,255,.42);border-bottom:1px solid rgba(67,190,255,.42)}.elmaq-mascot-panel strong{font-size:22px}}
+@media(max-width:390px){.elmaq-mascot{width:102px;height:154px}.elmaq-mascot-panel{bottom:145px;width:calc(100vw - 20px)}.elmaq-mascot-label{right:-78px}}
+@media(prefers-reduced-motion:reduce){.elmaq-mascot,.elmaq-mascot-panel,.elmaq-mascot-label,.elmaq-mascot-actions a{transition:none}.elmaq-mascot-trigger img,.elmaq-mascot-pulse{animation:none}}

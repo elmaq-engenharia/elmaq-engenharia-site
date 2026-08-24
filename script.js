@@ -10,7 +10,9 @@
   };
   load('ceo-v21.js?v=27', () => {
     load('rafael-v22.js?v=28', () => {
-      load('edson-v27.js?v=29', () => load('script-core-v20.js?v=27'));
+      load('edson-v27.js?v=29', () => {
+        load('mascote-v30.js?v=30', () => load('script-core-v20.js?v=27'));
+      });
     });
   });
 })();
