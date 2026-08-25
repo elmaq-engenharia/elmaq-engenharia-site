@@ -63,7 +63,6 @@ jobs:
               raw_name = unquote(Path(urlparse(url).path).name)
               safe_name = re.sub(r'[^A-Za-z0-9._-]+', '-', raw_name).strip('-') or f'midia-{i}'
               dest = media_dir / safe_name
-              # Evita colisao de nomes, mantendo extensao.
               if dest.exists():
                   stem, suffix = dest.stem, dest.suffix
                   dest = media_dir / f'{stem}-{i}{suffix}'
@@ -84,7 +83,6 @@ jobs:
                   print(f'[{i}/{len(urls)}] FALHA {url}: {exc}')
               time.sleep(0.10)
 
-          # Substitui as midias antigas por copias locais e remove caminhos absolutos /assets.
           for p in text_files(portable):
               try:
                   txt = p.read_text(encoding='utf-8')
@@ -99,7 +97,6 @@ jobs:
               txt = txt.replace("href='/assets/", "href='assets/")
               txt = txt.replace("'/assets/", "'assets/")
               txt = txt.replace('"/assets/', '"assets/')
-              # Metadados de domínio passam a ser relativos, evitando dependência da Vercel antiga.
               txt = txt.replace(f'<link rel="canonical" href="{old_site}">', '<link rel="canonical" href="./">')
               txt = txt.replace(f'<meta property="og:url" content="{old_site}">', '<meta property="og:url" content="./">')
               txt = txt.replace(f'<meta property="og:image" content="{old_site}assets/', '<meta property="og:image" content="assets/')
@@ -107,7 +104,6 @@ jobs:
               if txt != original:
                   p.write_text(txt, encoding='utf-8')
 
-          # Relatorio de referencias locais ausentes.
           missing = []
           ref_patterns = [
               re.compile(r'(?:src|href)=["\']([^"\']+)["\']', re.I),
@@ -123,6 +119,9 @@ jobs:
                       ref = ref.strip()
                       if not ref or ref.startswith(('#', 'http://', 'https://', 'mailto:', 'tel:', 'data:', 'javascript:')):
                           continue
+                      # Ignora referencias montadas dinamicamente pelo JavaScript; elas nao sao caminhos fisicos literais.
+                      if any(token in ref for token in ('${', '}', '(', ')', '`')):
+                          continue
                       clean = ref.split('?', 1)[0].split('#', 1)[0].lstrip('/')
                       if not clean:
                           continue
@@ -130,7 +129,6 @@ jobs:
                       if not candidate.exists():
                           missing.append((str(p.relative_to(portable)), ref))
 
-          # Confirma que nenhuma dependencia do host antigo de imagens permaneceu.
           old_domain_remaining = []
           for p in text_files(portable):
               try:
@@ -140,7 +138,6 @@ jobs:
               if 'elmaq-engenharia.gaunt-zephyr-1m.chatgpt.site' in txt:
                   old_domain_remaining.append(str(p.relative_to(portable)))
 
-          # Lista links externos intencionais que continuam externos (WhatsApp, redes etc.).
           external_links = set()
           http_re = re.compile(r'https?://[^\s"\'<>\)]+')
           for p in text_files(portable):
@@ -155,7 +152,7 @@ jobs:
               '# Backup físico e portátil — ELMAQ Engenharia',
               '',
               f'- Commit de origem: `{os.environ.get("GITHUB_SHA", "desconhecido")}`',
-              f'- Data do pacote: 2026-08-25',
+              '- Data do pacote: 2026-08-25',
               f'- Mídias externas detectadas: **{len(urls)}**',
               f'- Mídias externas baixadas: **{len(mapping)}**',
               f'- Falhas de download: **{len(failures)}**',
@@ -182,7 +179,6 @@ jobs:
           lines += [f'- {u}' for u in sorted(external_links)]
           manifest.write_text('\n'.join(lines) + '\n', encoding='utf-8')
 
-          # Script simples para abrir localmente no Windows.
           (portable / 'ABRIR_SITE_WINDOWS.bat').write_text(
               '@echo off\r\ncd /d %~dp0\r\nstart http://localhost:8080\r\npy -m http.server 8080\r\n',
               encoding='utf-8'
@@ -192,7 +188,6 @@ jobs:
               encoding='utf-8'
           )
 
-          # Checksums de todos os arquivos físicos.
           checksum_lines = []
           for p in sorted(portable.rglob('*')):
               if p.is_file() and p.name != 'CHECKSUMS_SHA256.txt':
@@ -200,7 +195,6 @@ jobs:
                   checksum_lines.append(f'{digest}  {p.relative_to(portable).as_posix()}')
           (portable / 'CHECKSUMS_SHA256.txt').write_text('\n'.join(checksum_lines) + '\n', encoding='utf-8')
 
-          # Relatório final e trava de qualidade.
           validation = portable / 'VALIDACAO_PORTABILIDADE.txt'
           validation.write_text(
               f'Midias externas detectadas: {len(urls)}\n'
