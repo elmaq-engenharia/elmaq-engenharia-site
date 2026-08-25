@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-  <url>
-    <loc>https://elmaq-engenharia-site.vercel.app/</loc>
-    <changefreq>monthly</changefreq>
-    <priority>1.0</priority>
-  </url>
+  <url><loc>https://elmaq-engenharia-site.vercel.app/</loc><lastmod>2026-08-25</lastmod><changefreq>weekly</changefreq><priority>1.0</priority></url>
+  <url><loc>https://elmaq-engenharia-site.vercel.app/maquina-de-fazer-blocos.html</loc><lastmod>2026-08-25</lastmod><changefreq>monthly</changefreq><priority>0.95</priority></url>
+  <url><loc>https://elmaq-engenharia-site.vercel.app/maquinas-para-fabrica-de-blocos.html</loc><lastmod>2026-08-25</lastmod><changefreq>monthly</changefreq><priority>0.95</priority></url>
+  <url><loc>https://elmaq-engenharia-site.vercel.app/maquina-de-paver.html</loc><lastmod>2026-08-25</lastmod><changefreq>monthly</changefreq><priority>0.90</priority></url>
+  <url><loc>https://elmaq-engenharia-site.vercel.app/central-de-agregados.html</loc><lastmod>2026-08-25</lastmod><changefreq>monthly</changefreq><priority>0.90</priority></url>
+  <url><loc>https://elmaq-engenharia-site.vercel.app/linha-automatica-artefatos-de-concreto.html</loc><lastmod>2026-08-25</lastmod><changefreq>monthly</changefreq><priority>0.90</priority></url>
 </urlset>
