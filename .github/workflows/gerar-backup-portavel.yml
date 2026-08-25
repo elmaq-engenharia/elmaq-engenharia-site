@@ -1,0 +1,232 @@
+name: Gerar backup portavel ELMAQ
+
+on:
+  push:
+    branches:
+      - backup-portavel-2026-08-25
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout do site
+        uses: actions/checkout@v4
+
+      - name: Montar pacote 100% transportavel
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          from urllib.parse import urlparse, unquote
+          from urllib.request import Request, urlopen
+          import hashlib
+          import os
+          import re
+          import shutil
+          import time
+
+          source = Path('.').resolve()
+          portable = source / 'ELMAQ_SITE_PORTABLE'
+          if portable.exists():
+              shutil.rmtree(portable)
+
+          ignore = shutil.ignore_patterns('.git', '.github', 'ELMAQ_SITE_PORTABLE', '*.zip')
+          shutil.copytree(source, portable, ignore=ignore)
+
+          text_exts = {'.html', '.css', '.js', '.xml', '.txt', '.md', '.json'}
+          old_media_re = re.compile(r'https://elmaq-engenharia\.gaunt-zephyr-1m\.chatgpt\.site/images/[A-Za-z0-9._~%/+-]+')
+          old_site = 'https://elmaq-engenharia-site.vercel.app/'
+
+          def text_files(root):
+              for p in root.rglob('*'):
+                  if p.is_file() and p.suffix.lower() in text_exts:
+                      yield p
+
+          urls = set()
+          for p in text_files(portable):
+              try:
+                  txt = p.read_text(encoding='utf-8')
+              except UnicodeDecodeError:
+                  continue
+              urls.update(old_media_re.findall(txt))
+
+          media_dir = portable / 'assets' / 'midias-maquinas-local'
+          media_dir.mkdir(parents=True, exist_ok=True)
+          mapping = {}
+          failures = []
+
+          for i, url in enumerate(sorted(urls), 1):
+              raw_name = unquote(Path(urlparse(url).path).name)
+              safe_name = re.sub(r'[^A-Za-z0-9._-]+', '-', raw_name).strip('-') or f'midia-{i}'
+              dest = media_dir / safe_name
+              # Evita colisao de nomes, mantendo extensao.
+              if dest.exists():
+                  stem, suffix = dest.stem, dest.suffix
+                  dest = media_dir / f'{stem}-{i}{suffix}'
+              try:
+                  req = Request(url, headers={
+                      'User-Agent': 'Mozilla/5.0 (compatible; ELMAQ-Portable-Backup/1.0)',
+                      'Accept': 'image/avif,image/webp,image/apng,image/svg+xml,image/*,*/*;q=0.8'
+                  })
+                  with urlopen(req, timeout=45) as resp:
+                      data = resp.read()
+                  if len(data) < 100:
+                      raise RuntimeError(f'arquivo muito pequeno ({len(data)} bytes)')
+                  dest.write_bytes(data)
+                  mapping[url] = f'assets/midias-maquinas-local/{dest.name}'
+                  print(f'[{i}/{len(urls)}] OK {url} -> {dest.name} ({len(data)} bytes)')
+              except Exception as exc:
+                  failures.append((url, str(exc)))
+                  print(f'[{i}/{len(urls)}] FALHA {url}: {exc}')
+              time.sleep(0.10)
+
+          # Substitui as midias antigas por copias locais e remove caminhos absolutos /assets.
+          for p in text_files(portable):
+              try:
+                  txt = p.read_text(encoding='utf-8')
+              except UnicodeDecodeError:
+                  continue
+              original = txt
+              for url, local in mapping.items():
+                  txt = txt.replace(url, local)
+              txt = txt.replace('src="/assets/', 'src="assets/')
+              txt = txt.replace("src='/assets/", "src='assets/")
+              txt = txt.replace('href="/assets/', 'href="assets/')
+              txt = txt.replace("href='/assets/", "href='assets/")
+              txt = txt.replace("'/assets/", "'assets/")
+              txt = txt.replace('"/assets/', '"assets/')
+              # Metadados de domínio passam a ser relativos, evitando dependência da Vercel antiga.
+              txt = txt.replace(f'<link rel="canonical" href="{old_site}">', '<link rel="canonical" href="./">')
+              txt = txt.replace(f'<meta property="og:url" content="{old_site}">', '<meta property="og:url" content="./">')
+              txt = txt.replace(f'<meta property="og:image" content="{old_site}assets/', '<meta property="og:image" content="assets/')
+              txt = txt.replace("'https://elmaq-engenharia-site.vercel.app/' + src.split('?')[0] + '?v=20'", "new URL(src.split('?')[0] + '?v=20', window.location.href).href")
+              if txt != original:
+                  p.write_text(txt, encoding='utf-8')
+
+          # Relatorio de referencias locais ausentes.
+          missing = []
+          ref_patterns = [
+              re.compile(r'(?:src|href)=["\']([^"\']+)["\']', re.I),
+              re.compile(r'url\(["\']?([^\)"\']+)', re.I),
+          ]
+          for p in text_files(portable):
+              try:
+                  txt = p.read_text(encoding='utf-8')
+              except UnicodeDecodeError:
+                  continue
+              for pat in ref_patterns:
+                  for ref in pat.findall(txt):
+                      ref = ref.strip()
+                      if not ref or ref.startswith(('#', 'http://', 'https://', 'mailto:', 'tel:', 'data:', 'javascript:')):
+                          continue
+                      clean = ref.split('?', 1)[0].split('#', 1)[0].lstrip('/')
+                      if not clean:
+                          continue
+                      candidate = (portable / clean) if '/' in clean or clean.startswith('assets') else (p.parent / clean)
+                      if not candidate.exists():
+                          missing.append((str(p.relative_to(portable)), ref))
+
+          # Confirma que nenhuma dependencia do host antigo de imagens permaneceu.
+          old_domain_remaining = []
+          for p in text_files(portable):
+              try:
+                  txt = p.read_text(encoding='utf-8')
+              except UnicodeDecodeError:
+                  continue
+              if 'elmaq-engenharia.gaunt-zephyr-1m.chatgpt.site' in txt:
+                  old_domain_remaining.append(str(p.relative_to(portable)))
+
+          # Lista links externos intencionais que continuam externos (WhatsApp, redes etc.).
+          external_links = set()
+          http_re = re.compile(r'https?://[^\s"\'<>\)]+')
+          for p in text_files(portable):
+              try:
+                  txt = p.read_text(encoding='utf-8')
+              except UnicodeDecodeError:
+                  continue
+              external_links.update(http_re.findall(txt))
+
+          manifest = portable / 'MANIFESTO_BACKUP_PORTATIL.md'
+          lines = [
+              '# Backup físico e portátil — ELMAQ Engenharia',
+              '',
+              f'- Commit de origem: `{os.environ.get("GITHUB_SHA", "desconhecido")}`',
+              f'- Data do pacote: 2026-08-25',
+              f'- Mídias externas detectadas: **{len(urls)}**',
+              f'- Mídias externas baixadas: **{len(mapping)}**',
+              f'- Falhas de download: **{len(failures)}**',
+              f'- Referências locais ausentes na validação: **{len(missing)}**',
+              f'- Arquivos ainda contendo o host antigo de imagens: **{len(old_domain_remaining)}**',
+              '',
+              '## Como publicar',
+              'Envie o conteúdo desta pasta para a raiz de qualquer hospedagem estática (Vercel, Hostinger, Netlify, GitHub Pages ou servidor web comum). O arquivo inicial é `index.html`.',
+              '',
+              '## Dependências externas intencionais',
+              'Links de WhatsApp, Instagram, LinkedIn, e-mail e outros destinos comerciais permanecem externos por serem canais de atendimento, não arquivos necessários para renderizar o site.',
+              '',
+              '## Mídias incorporadas ao backup',
+          ]
+          for url, local in sorted(mapping.items()):
+              lines.append(f'- `{url}` → `{local}`')
+          if failures:
+              lines += ['', '## Falhas']
+              lines += [f'- `{u}` — {e}' for u, e in failures]
+          if missing:
+              lines += ['', '## Referências locais ausentes']
+              lines += [f'- `{f}` → `{r}`' for f, r in sorted(set(missing))]
+          lines += ['', '## Links externos encontrados']
+          lines += [f'- {u}' for u in sorted(external_links)]
+          manifest.write_text('\n'.join(lines) + '\n', encoding='utf-8')
+
+          # Script simples para abrir localmente no Windows.
+          (portable / 'ABRIR_SITE_WINDOWS.bat').write_text(
+              '@echo off\r\ncd /d %~dp0\r\nstart http://localhost:8080\r\npy -m http.server 8080\r\n',
+              encoding='utf-8'
+          )
+          (portable / 'ABRIR_SITE_LINUX_MAC.sh').write_text(
+              '#!/usr/bin/env sh\ncd "$(dirname "$0")"\npython3 -m http.server 8080\n',
+              encoding='utf-8'
+          )
+
+          # Checksums de todos os arquivos físicos.
+          checksum_lines = []
+          for p in sorted(portable.rglob('*')):
+              if p.is_file() and p.name != 'CHECKSUMS_SHA256.txt':
+                  digest = hashlib.sha256(p.read_bytes()).hexdigest()
+                  checksum_lines.append(f'{digest}  {p.relative_to(portable).as_posix()}')
+          (portable / 'CHECKSUMS_SHA256.txt').write_text('\n'.join(checksum_lines) + '\n', encoding='utf-8')
+
+          # Relatório final e trava de qualidade.
+          validation = portable / 'VALIDACAO_PORTABILIDADE.txt'
+          validation.write_text(
+              f'Midias externas detectadas: {len(urls)}\n'
+              f'Midias externas baixadas: {len(mapping)}\n'
+              f'Falhas de download: {len(failures)}\n'
+              f'Referencias locais ausentes: {len(set(missing))}\n'
+              f'Arquivos com host antigo: {len(old_domain_remaining)}\n',
+              encoding='utf-8'
+          )
+
+          if failures or old_domain_remaining:
+              raise SystemExit('Backup incompleto: existem falhas de download ou referencias ao host antigo.')
+          if missing:
+              print('ATENCAO: referencias locais ausentes detectadas:')
+              for item in sorted(set(missing)):
+                  print(' -', item)
+              raise SystemExit('Backup incompleto: existem referencias locais ausentes.')
+
+          archive = shutil.make_archive('ELMAQ_SITE_PORTABLE_2026-08-25', 'zip', root_dir=portable)
+          print('PACOTE GERADO:', archive)
+          PY
+
+      - name: Publicar ZIP como artefato
+        uses: actions/upload-artifact@v4
+        with:
+          name: ELMAQ_SITE_PORTABLE_2026-08-25
+          path: ELMAQ_SITE_PORTABLE_2026-08-25.zip
+          if-no-files-found: error
+          retention-days: 30
